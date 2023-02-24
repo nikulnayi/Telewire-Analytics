@@ -53,8 +53,8 @@ def get_test_data():
     return X_test,y_test
 
 
-input_data_path = 'C:/Users/Harsh Patel/Desktop/Loyalist Term 4/AIP/TBC-AIP-2023-A7_Telewire-Analytics/data/raw/Telewire Analytics Cell_tower_data.csv'
-output_data_path = 'C:/Users/Harsh Patel/Desktop/Loyalist Term 4/AIP/TBC-AIP-2023-A7_Telewire-Analytics/data/raw/'
+input_data_path = '../data/raw/data.csv'
+output_data_path = '../data/raw/'
 
 # funtion call
 split_telewire_data(input_data_path, output_data_path)
