@@ -38,6 +38,21 @@ def split_telewire_data(input_filepath, output_folder):
     training_data.to_csv(output_folder+'train.csv')
     testing_data.to_csv(output_folder+'test.csv')
 
+
+def get_train_data():
+    train_data = pd.read_csv('../data/raw/train.csv',  encoding= 'unicode_escape')
+    y_train = train_data["Unusual"]                      #defining the labels
+    X_train = train_data.drop(["Unusual"], axis=1)
+
+    return X_train,y_train
+
+def get_test_data():
+    test_data = pd.read_csv('../data/raw/test.csv',  encoding= 'unicode_escape')
+    y_test = test_data["Unusual"]                      #defining the labels
+    X_test = test_data.drop(["Unusual"], axis=1)
+    return X_test,y_test
+
+
 input_data_path = 'C:/Users/Harsh Patel/Desktop/Loyalist Term 4/AIP/TBC-AIP-2023-A7_Telewire-Analytics/data/raw/Telewire Analytics Cell_tower_data.csv'
 output_data_path = 'C:/Users/Harsh Patel/Desktop/Loyalist Term 4/AIP/TBC-AIP-2023-A7_Telewire-Analytics/data/raw/'
 
