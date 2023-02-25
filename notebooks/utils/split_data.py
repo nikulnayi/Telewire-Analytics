@@ -22,7 +22,7 @@ def split_telewire_data(input_filepath, output_folder):
     Returns
     -------
     Null
-    
+
     Examples
     --------
     >>> input_file = '../data/raw/data.csv'
