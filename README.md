@@ -1,4 +1,4 @@
-project_name
+Telewire Analytics
 ==============================
 
 A short description of the project.
