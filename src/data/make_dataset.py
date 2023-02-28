@@ -3,6 +3,9 @@ import click
 import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
+import pandas as pd
+from sklearn.pipeline import Pipeline
+from joblib import load
 
 
 @click.command()
@@ -13,7 +16,32 @@ def main(input_filepath, output_filepath):
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
-    logger.info('making final data set from raw data')
+
+    try:
+        try:
+            # Getting Data
+            data = pd.read_csv(input_filepath,  encoding= 'unicode_escape')
+            logger.info('Data Loaded Sucessfully')
+        except ValueError: 
+            logger.info('Loading Data Error:',ValueError)
+        
+        try:
+        # Define the model pipeline
+            pipeline = Pipeline([
+                ('preprocessing', load('notebooks/pipelines/PreprocessingPipeline.pkl'))   
+            ]) 
+            logger.info('Data Processed Successfully')
+        except ValueError: 
+            logger.info('Transforming Data Error:',ValueError)
+
+        try:
+            pd.DataFrame(pipeline.fit_transform(data)).to_csv(output_filepath, index=False)
+            logger.info('Saved Processed Data at..',output_filepath)
+        except ValueError: 
+            logger.info('Saving CSV Error',ValueError)
+    except ValueError:
+        logger.info('Operation Failed',ValueError)
+    
 
 
 if __name__ == '__main__':
