@@ -5,6 +5,7 @@
 
 
 import pandas as pd
+import os
 from sklearn.model_selection import train_test_split
 
 def split_telewire_data(input_filepath, output_folder):
@@ -29,6 +30,8 @@ def split_telewire_data(input_filepath, output_folder):
     >>> output_loc = '../data/raw/'
     >>> split_data(input_file, output_loc)
     """
+    current_path = os.path.abspath(__file__)
+    print(current_path)
 
     # Unit tests
     assert input_filepath[-4:] == '.csv', "Input file has to be .csv!"               #Check that input file is .csv
@@ -40,8 +43,8 @@ def split_telewire_data(input_filepath, output_folder):
     training_data, testing_data = train_test_split(cell_tower_data, test_size=0.3, random_state=11)
     
     # saving the train and test data in different files
-    training_data.to_csv(output_folder+'train.csv')
-    testing_data.to_csv(output_folder+'test.csv')
+    training_data.to_csv(output_folder+'train.csv',index=False)
+    testing_data.to_csv(output_folder+'test.csv',index=False)
 
 
 def get_train_data():
@@ -58,9 +61,11 @@ def get_test_data():
     return X_test,y_test
 
 
-input_data_path ='../data/raw/data.csv'
-output_data_path = '../data/raw/'
+input_data_path ='../../data/raw/data.csv'
+output_data_path = '../../data/raw/'
 
 # funtion call
 split_telewire_data(input_data_path, output_data_path)
 
+
+# %%
