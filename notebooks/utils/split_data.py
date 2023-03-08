@@ -8,6 +8,12 @@ import pandas as pd
 import os
 from sklearn.model_selection import train_test_split
 
+# Get the path of the current file
+file_path = os.path.abspath(__file__)
+
+# Get the path of the root directory
+root_dir = os.path.dirname(os.path.dirname(os.path.dirname(file_path)))
+
 def split_telewire_data(input_filepath, output_folder):
     """This function splits an input dataset into train
     and test sets, and saves these in the output_folder.
@@ -48,23 +54,24 @@ def split_telewire_data(input_filepath, output_folder):
 
 
 def get_train_data():
-    train_data = pd.read_csv('../data/raw/train.csv',  encoding= 'unicode_escape')
+    train_data = pd.read_csv(root_dir+'/data/raw/train.csv',  encoding= 'unicode_escape')
     y_train = train_data["Unusual"]                      #defining the labels
     X_train = train_data.drop(["Unusual"], axis=1)
 
     return X_train,y_train
 
 def get_test_data():
-    test_data = pd.read_csv('../data/raw/test.csv',  encoding= 'unicode_escape')
+    test_data = pd.read_csv(root_dir+'/data/raw/test.csv',  encoding= 'unicode_escape')
     y_test = test_data["Unusual"]                      #defining the labels
     X_test = test_data.drop(["Unusual"], axis=1)
     return X_test,y_test
 
 
-input_data_path ='../../data/raw/data.csv'
-output_data_path = '../../data/raw/'
-
+input_data_path = root_dir+'/data/raw/data.csv'
+output_data_path = root_dir+'/data/raw/'
+#print(input_data_path)
 # funtion call
+
 split_telewire_data(input_data_path, output_data_path)
 
 
