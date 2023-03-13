@@ -1,8 +1,15 @@
 import pandas as pd
 from dash import Dash, dcc, html
+import os
 
+# Get the path of the current file
+file_path = os.path.abspath(__file__)
+
+# Get the path of the root directory
+root_dir = os.path.dirname(os.path.dirname(os.path.dirname(file_path)))
+data_file_path = "\\TBC-AIP-2023-A7_Telewire-Analytics\\data\\raw\\data.csv"
 data = (
-    pd.read_csv("../data/raw/data.csv",encoding='latin1')
+    pd.read_csv(root_dir+data_file_path,encoding='latin1')
 )
 external_stylesheets = [
     {
@@ -28,12 +35,10 @@ app.layout = html.Div(
         html.P(
             children=(
                 "Analysis of Cell Tower Data"
-                ),
-                className="header-description",
+                )
 
             )
-    ],
-    className='header'
+    ]
 )
 
 if __name__ == "__main__":
