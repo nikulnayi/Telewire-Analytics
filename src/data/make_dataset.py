@@ -4,8 +4,11 @@ import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 import pandas as pd
+import numpy as np
 from sklearn.pipeline import Pipeline
 from joblib import load
+import dill
+from sklearn.preprocessing import StandardScaler, OneHotEncoder, LabelEncoder
 
 
 @click.command()
@@ -16,7 +19,7 @@ def main(input_filepath, output_filepath):
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
-
+    project_dir = Path(__file__).resolve().parents[2]
     try:
         try:
             # Getting Data
@@ -27,12 +30,11 @@ def main(input_filepath, output_filepath):
         
         try:
         # Define the model pipeline
-            pipeline = Pipeline([
-                ('preprocessing', load('notebooks/pipelines/PreprocessingPipeline.pkl'))   
-            ]) 
-            logger.info('Data Processed Successfully')
+            with open(project_dir.joinpath('notebooks/pipelines/PreprocessingPipeline2.0.pkl'), 'rb') as f:
+                pipeline = dill.load(f)
+            logger.info('Processing Pipeline Loaded')
         except ValueError: 
-            logger.info('Transforming Data Error:',ValueError)
+            logger.info('TError in loading processing pipeline :',ValueError)
 
         try:
             pd.DataFrame(pipeline.fit_transform(data)).to_csv(output_filepath, index=False)
@@ -47,12 +49,6 @@ def main(input_filepath, output_filepath):
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(level=logging.INFO, format=log_fmt)
-
-    # not used in this stub but often useful for finding various files
-    project_dir = Path(__file__).resolve().parents[2]
-
-    # find .env automagically by walking up directories until it's found, then
-    # load up the .env entries as environment variables
     load_dotenv(find_dotenv())
 
     main()
