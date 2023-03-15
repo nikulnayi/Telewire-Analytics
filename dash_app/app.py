@@ -4,6 +4,8 @@ from dash import dash_table
 import dash_bootstrap_components as dbc
 import dash 
 import os
+from dash.dependencies import Input, Output, State
+
 
 # Get the path of the current file
 file_path = os.path.abspath(__file__)
@@ -19,8 +21,9 @@ data = (
 )
 
 
-
-app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
+count_usual = data[data['Unusual']==0]['Unusual'].count()
+count_unusual = data[data['Unusual']==1]['Unusual'].count()
+app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY,'https://codepen.io/chriddyp/pen/bWLwgP.css'])
 app.title = "Telewire Analytics"
 
 ############################## navigation bar ################################
@@ -42,13 +45,22 @@ navbar = dbc.Navbar( id = 'navbar', children = [
         ),
     href = '/'
     ),
-    
-                dbc.Row(
+    ### upload data here
+    dbc.Row(
             [
-        dbc.Col( 
-            dbc.Button(id = 'button', children = "Team Members", color = "primary", className = 'ml-auto', href = '/')
-
-            )        
+        dbc.Col([
+            # dbc.Button(id = 'button', children = "Team Members", color = "primary", className = 'ml-auto', href = '/'),
+            
+            html.Div(html.H4('Upload Data Here'),
+                      style = {'fontWeight':'bold','family':'georgia','width':'100%','color':'#000000',}),
+                      
+            dcc.Upload(id ='upload-data', 
+                       children = html.Button('Upload File'), 
+                       style={'margin-right':'100px'}
+                    #    mutiple= True
+            ),
+            # html.Div(id='output-data-upload')
+            ])        
     ],
 
      className="g-0 ms-auto flex-nowrap mt-3 mt-md-0",
@@ -57,18 +69,67 @@ navbar = dbc.Navbar( id = 'navbar', children = [
 
 
     ])
-dash_body = [
-    dbc.Row(
-    [
-    dash_table.DataTable(
-        id='table',
-        columns=[{'name': i, 'id': i} for i in data.columns],
-        data=data.head(3).to_dict('records')
-    )
 
-    ]
+# Count of Normal and Unusual
+def data_for_cases(header, count_value):
+    card_content = [
+        dbc.CardHeader(header),
+
+        dbc.CardBody(
+            [
+               dcc.Markdown( dangerously_allow_html = True,
+                   children = ["{0}".format(count_value)])
+
+
+                ]
+
+            )
+        ]
+
+    return card_content
+
+
+# App call for file upload
+@app.callback(Output('output-data-upload', 'children'),
+              Input('upload-data', 'contents'),
+              State('upload-data', 'filename'))
+def update_output(contents, filename):
+    if contents is not None:
+        # Assume that the user uploaded a CSV file
+        # df = pd.read_csv(contents[0])
+        print(contents[1])
+        return html.Div([
+            html.H5(filename),
+            html.Hr(),
+            # Use the DataTable component from the dash-table library
+            dcc.DataTable(
+                # data=df.to_dict('records'),
+                # columns=[{'name': i, 'id': i} for i in df.columns]
+            ),
+            html.Hr(),
+            # Display the raw contents of the file
+            html.Div('Raw Content'),
+            html.Pre(contents[0], style={'whiteSpace': 'pre-wrap', 'wordBreak': 'break-all'})
+        ])
+    else:
+        return ''
+dash_body = [
+    dbc.Row(html.Div(id='output-data-upload')
 
     ),
+     dbc.Row([
+        dbc.Col(dbc.Card(data_for_cases("Count of Normal",f'{count_usual}'), color = 'success',style = {'text-align':'center'}, inverse = True),xs = 12, sm = 12, md = 4, lg = 4, xl = 4, style = {'padding':'12px 12px 12px 12px'}),
+        # dbc.Col(dbc.Card(data_for_cases("Recovered",f'{recovered:,}',f'{newrecovered:,}' ), color = 'success',style = {'text-align':'center'}, inverse = True),xs = 12, sm = 12, md = 4, lg = 4, xl = 4, style = {'padding':'12px 12px 12px 12px'}),
+        dbc.Col(dbc.Card( data_for_cases("Count of Unusual",f'{count_unusual}'), color = 'danger',style = {'text-align':'center'}, inverse = True),xs = 12, sm = 12, md = 4, lg = 4, xl = 4, style = {'padding':'12px 12px 12px 12px'}),
+        
+
+       
+
+
+        ]),
+
+    html.Br(),
+    html.Br(),
     dbc.Row(
         [
             dbc.Col(html.Img(src="https://www.pngitem.com/pimgs/m/271-2719410_bar-chart-with-four-columns-showing-progression-cell.png",height = "240px")
