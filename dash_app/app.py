@@ -2,7 +2,7 @@ import pandas as pd
 from dash import Dash, dcc, html
 from dash import dash_table
 import dash_bootstrap_components as dbc
-import dash 
+import dash
 import os
 from dash.dependencies import Input, Output, State
 
@@ -132,9 +132,11 @@ dash_body = [
     html.Br(),
     dbc.Row(
         [
-            dbc.Col(html.Img(src="https://www.pngitem.com/pimgs/m/271-2719410_bar-chart-with-four-columns-showing-progression-cell.png",height = "240px")
+            dbc.Col(html.Img(src="https://www.pngitem.com/pimgs/m/271-2719410_bar-chart-with-four-columns-showing-progression-cell.png", height = "240px"), 
+                    style={'margin-left':'50px'}
             ),
-            dbc.Col(html.Img(src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRG-gfguToHxv_fQOIN6m_CHbDVJ_XWEBtGNQ&usqp=CAU",height = "240px")
+            dbc.Col(html.Img(src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRG-gfguToHxv_fQOIN6m_CHbDVJ_XWEBtGNQ&usqp=CAU", height = "240px"),
+                    style={'margin-left':'50px'}
             ),
         ],
         className="second-row",
