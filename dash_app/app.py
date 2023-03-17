@@ -2,14 +2,18 @@ import pandas as pd
 from dash import Dash, dcc, html
 from dash import dash_table
 import dash_bootstrap_components as dbc
+<<<<<<< HEAD
 import dash
 import os
+=======
+import os, io, base64
+>>>>>>> 8b7e24585f2e28a676e872812613c1fe9f27d862
 from dash.dependencies import Input, Output, State
 
 
 # Get the path of the current file
 file_path = os.path.abspath(__file__)
-
+uploaded_data = None
 # Get the path of the root directory
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(file_path)))
 COVID_IMG = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeqOxnyNX_UCarYAKSkIsY7CWQZlBzULPyMg&usqp=CAU"
@@ -88,45 +92,36 @@ def data_for_cases(header, count_value):
 
     return card_content
 
-
-# App call for file upload
-@app.callback(Output('output-data-upload', 'children'),
-              Input('upload-data', 'contents'),
-              State('upload-data', 'filename'))
-def update_output(contents, filename):
-    if contents is not None:
-        # Assume that the user uploaded a CSV file
-        # df = pd.read_csv(contents[0])
-        print(contents[1])
+# csv data parsing
+def data(contents, filename):
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    try:
+        if '.csv' in filename:
+            # Assume that the user uploaded a CSV file
+            df = pd.read_csv(io.StringIO(decoded.decode('ISO-8859-1')))
+        elif '.xls' in filename:
+            # Assume that the user uploaded an Excel file
+            df = pd.read_excel(io.BytesIO(decoded))
+    except Exception as e:
+        print(e)
         return html.Div([
-            html.H5(filename),
-            html.Hr(),
-            # Use the DataTable component from the dash-table library
-            dcc.DataTable(
-                # data=df.to_dict('records'),
-                # columns=[{'name': i, 'id': i} for i in df.columns]
-            ),
-            html.Hr(),
-            # Display the raw contents of the file
-            html.Div('Raw Content'),
-            html.Pre(contents[0], style={'whiteSpace': 'pre-wrap', 'wordBreak': 'break-all'})
+            'There was an error processing this file.'
         ])
-    else:
-        return ''
-dash_body = [
-    dbc.Row(html.Div(id='output-data-upload')
+    return df
 
-    ),
-     dbc.Row([
+
+
+dash_body = [
+    # html.Div(id='output-data-upload'),
+
+    dbc.Row([
         dbc.Col(dbc.Card(data_for_cases("Count of Normal",f'{count_usual}'), color = 'success',style = {'text-align':'center'}, inverse = True),xs = 12, sm = 12, md = 4, lg = 4, xl = 4, style = {'padding':'12px 12px 12px 12px'}),
         # dbc.Col(dbc.Card(data_for_cases("Recovered",f'{recovered:,}',f'{newrecovered:,}' ), color = 'success',style = {'text-align':'center'}, inverse = True),xs = 12, sm = 12, md = 4, lg = 4, xl = 4, style = {'padding':'12px 12px 12px 12px'}),
         dbc.Col(dbc.Card( data_for_cases("Count of Unusual",f'{count_unusual}'), color = 'danger',style = {'text-align':'center'}, inverse = True),xs = 12, sm = 12, md = 4, lg = 4, xl = 4, style = {'padding':'12px 12px 12px 12px'}),
         
 
-       
-
-
-        ]),
+        ],id='new_data'),
 
     html.Br(),
     html.Br(),
@@ -173,7 +168,24 @@ page_layout = html.Div(
         dbc.Col(dash_body, className="body"),
     ],
 )
-
+# App call for file upload
+@app.callback(Output('new_data', 'children'),
+              Input('upload-data', 'contents'),
+              State('upload-data', 'filename'))
+def update_output(contents, filename):
+    if contents is not None:
+        uploaded_data =  data(contents,filename)
+        usual_cout = uploaded_data[uploaded_data['Unusual']==0]['Unusual'].count()
+        Unusual_cout = uploaded_data[uploaded_data['Unusual']==1]['Unusual'].count()
+        children =[
+             dbc.Col(dbc.Card(data_for_cases("Count of Normal",f'{usual_cout}'), color = 'success',style = {'text-align':'center'}, inverse = True),xs = 12, sm = 12, md = 4, lg = 4, xl = 4, style = {'padding':'12px 12px 12px 12px'}),
+            dbc.Col(dbc.Card( data_for_cases("Count of Unusual",f'{Unusual_cout}'), color = 'danger',style = {'text-align':'center'}, inverse = True),xs = 12, sm = 12, md = 4, lg = 4, xl = 4, style = {'padding':'12px 12px 12px 12px'}),
+        
+        ]
+        return children
+        
+    else:
+        return ''
 
 # Overall layout
 app.layout = html.Div(id="main", className="app", children=page_layout) 
