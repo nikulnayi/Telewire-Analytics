@@ -3,6 +3,24 @@ import pandas as pd
 import time
 import matplotlib.pyplot as plt
 import altair as alt
+import numpy as np
+from pathlib import Path
+
+# from preprocessing
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.base import BaseEstimator, TransformerMixin
+import dill
+from sklearn import set_config
+
+# from model
+from xgboost import XGBClassifier
+
+import sys
+
+# import the pipeline file
+sys.path.insert(1,'../src')
+import predict
 
 st.set_page_config(
     page_title="Telewire Dashboard",
@@ -24,13 +42,13 @@ with st.sidebar:
 if file is not None:
     df = pd.read_csv(file,encoding='windows-1254')
     
-
-    with st.spinner('Processing...'):
+    df = predict.predict(df)
+    with st.spinner('Processing..'):
     # Do some time-consuming computation
         # time.sleep(0.75)
-
+    
     # Once the computation is done, remove the spinner
-        st.success('Processing done!')
+        # st.success('Processing done!')
         
         count_normal = df[df['Unusual']==0]['Unusual'].count()
         count_abnormal = df[df['Unusual']==1]['Unusual'].count()
@@ -48,39 +66,49 @@ if file is not None:
             label="Count of Abnormal Cell Tower",
             value=count_abnormal
         )
+        col1,col2=st.columns(2)
+        with col1:
+            # create a pie chart with the data
+            st.text("Percentage share of Usual and Unusual")
+            sizes = [count_normal,count_abnormal]
+            explode = (0, 0.1)
+            fig1, ax1 = plt.subplots()
+            labels=df['Unusual'].replace({0:"Usual",1:"Unusual"}).unique()
 
-        # create a pie chart with the data
-        sizes = [count_normal,count_abnormal]
-        explode = (0, 0.1)
-        fig1, ax1 = plt.subplots()
-        ax1.pie(sizes, labels=df['Unusual'].replace({0:"Unusual",1:"Usual"}).unique(),explode=explode, autopct='%1.1f%%', startangle=90)
-        ax1.axis('equal')
+            ax1.pie(sizes, labels=labels[::-1],explode=explode, autopct='%1.1f%%', startangle=90)
+            ax1.axis('equal')
 
-        st.pyplot(fig1)
+            st.pyplot(fig1)
+        with col2:
+            # Bar graph
+            # group by 'Cell Name' and count the number of occurrences of 0 and 1
+            counts = df.groupby(['CellName', 'Unusual'])['Unusual'].count()
+
+            # convert counts to a DataFrame and unstack the 'Status' index level
+            counts_df = counts.unstack(level='Unusual', fill_value=0)
+
+            st.bar_chart(counts_df)
+
+
+        col1,col2 = st.columns(2)
+        # with col1:
+        #     st.text("Distribution of Time During Unusual")
+        #     fig, ax = plt.subplots()
+        #     # ax.tick_params(axis='x', rotation=90)
+        #     hour_data = pd.to_datetime(df[df['Unusual']==1]['Time'],format='%H:%M').dt.hour
+            
+        #     ax.hist(hour_data, bins=10,range=(0,24))
+        #     # set the x-axis label
+        #     plt.xlabel('Hour')
+
+        #     # set the y-axis label
+        #     plt.ylabel('Frequency')
+        #     st.pyplot(fig)
         
-        # Bar graph
-        # group by 'Cell Name' and count the number of occurrences of 0 and 1
-        counts = df.groupby(['CellName', 'Unusual'])['Unusual'].count()
-
-        # convert counts to a DataFrame and unstack the 'Status' index level
-        counts_df = counts.unstack(level='Unusual', fill_value=0)
-
-        st.bar_chart(counts_df)
-
-        # Abnormal count
-        # st.write("Total no of Unusual Cell Tower:",count_abnormal)
-        # st.write(df[df['Unusual']==1])
-
-        # Celltower and time
-        # fig, ax = plt.subplots()
-
-        # ax.bar(df_grouped[df_grouped['Unusual'] == 0]['CellName'], 
-        #         df_grouped[df_grouped['Unusual'] == 0]['Time'], label='X')
-        # ax.bar(df_grouped[df_grouped['Unusual'] == 1]['CellName'], 
-        #         df_grouped[df_grouped['Unusual'] == 1]['Time'], label='Y')
-    
+        
+        
         # Create an Altair chart
-        chart = alt.Chart(df).mark_circle(size=100).encode(
+        chart = alt.Chart(df).mark_circle(size=25).encode(
             x='CellName',
             y='Time',
             color='Unusual'
