@@ -7,13 +7,11 @@ import dill
 
 # Load the predictive model from a pickle file
 project_dir = Path(__file__).resolve().parents[1]
-
-# Load the preprocessing pipeline from a pickle file
-with open(project_dir.joinpath('models/ModelXGboost.pkl'), 'rb') as f:
-    model = dill.load(f)
-
 # Define a function to make predictions
 def predict(df):
+    # Load the preprocessing pipeline from a pickle file
+    with open(project_dir.joinpath('models/ModelXGboost.pkl'), 'rb') as f:
+        model = dill.load(f)
     # Preprocess the data using the preprocessing function
     preprocessed_df = preprocess(df)
     
