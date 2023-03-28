@@ -129,7 +129,6 @@ if file is not None:
         st.header("Data Science Team")
     
     if opt == 'Summary':
-        st.header("Summary") 
         def get_table(df):
             datatable = df.drop('Unusual',axis=1)
             return datatable
