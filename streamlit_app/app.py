@@ -19,7 +19,7 @@ from xgboost import XGBClassifier
 import sys
 
 # import the pipeline file
-print(sys.path.insert(1,'../src'))
+sys.path.insert(0,'../src')
 #import predict
 
 st.set_page_config(
@@ -29,8 +29,17 @@ st.set_page_config(
 col1,col2 = st.columns([0.75,6])
 
 # with col2:
-st.title("Cell Tower Anomaly Detection")
-st.markdown("This is a web app that uses the Cell Tower Log data to predict if it perfroms abnormal or not. The source code of this app is available on [Github](https://github.com/Anupriya-Sri/TBC-AIP-2023-A7_Telewire-Analytics)")   
+col1, mid, col2 = st.columns([200,20,20])
+with col1:
+    st.header('Cell Tower Anomaly Detection')
+    
+with col2:
+    st.image('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeqOxnyNX_UCarYAKSkIsY7CWQZlBzULPyMg&usqp=CAU.png', width=100)
+    
+
+# st.title("Cell Tower Anomaly Detection")
+# st.image("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeqOxnyNX_UCarYAKSkIsY7CWQZlBzULPyMg&usqp=CAU.png")
+st.markdown("This is a web app that uses the Cell Tower Log data to predict if the current sample corresponds to normal or abnormal behaviour.")   
 with st.sidebar:
     
     st.header("Upload Data file here for prediction")
@@ -40,8 +49,6 @@ with st.sidebar:
 
     opt = st.radio(label = 'Who is viewing', options = ['Management','Data Science Team','Summary'])
     
-
-
 
 
 if file is not None:
@@ -108,25 +115,25 @@ if file is not None:
         #     # set the y-axis label
         #     plt.ylabel('Frequency')
         #     st.pyplot(fig)
+    
         
         
-        
-        # Create an Altair chart
-        chart = alt.Chart(df).mark_circle(size=25).encode(
-            x='CellName',
-            y='Time',
-            color='Unusual'
-        ).properties(
-            width=700,
-            height=500
-        )
+        # # Create an Altair chart
+        # chart = alt.Chart(df).mark_circle(size=25).encode(
+        #     x='CellName',
+        #     y='Time',
+        #     color='Unusual'
+        # ).properties(
+        #     width=700,
+        #     height=500
+        # )
 
-        # Render the chart in Streamlit
-        st.altair_chart(chart, use_container_width=True)
+        # # Render the chart in Streamlit
+        # st.altair_chart(chart, use_container_width=True)
 
 
     if opt == 'Data Science Team':
-        st.header("Data Science Team")
+        st.markdown("The source code of this app is available on [Github](https://github.com/Anupriya-Sri/TBC-AIP-2023-A7_Telewire-Analytics)")
     
     if opt == 'Summary':
         def get_table(df):
