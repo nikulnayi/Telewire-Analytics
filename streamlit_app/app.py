@@ -19,7 +19,7 @@ from xgboost import XGBClassifier
 import sys
 
 # import the pipeline file
-sys.path.insert(1,'../src')
+print(sys.path.insert(1,'../src'))
 import predict
 
 st.set_page_config(
@@ -42,7 +42,7 @@ with st.sidebar:
 if file is not None:
     df = pd.read_csv(file,encoding='windows-1254')
     
-    df = predict.predict(df)
+    # df = predict.predict(df)  
     with st.spinner('Processing..'):
     # Do some time-consuming computation
         # time.sleep(0.75)
