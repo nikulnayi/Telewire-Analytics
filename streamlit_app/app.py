@@ -20,7 +20,7 @@ import sys
 
 # import the pipeline file
 print(sys.path.insert(1,'../src'))
-import predict
+#import predict
 
 st.set_page_config(
     page_title="Telewire Dashboard",
@@ -38,22 +38,26 @@ with st.sidebar:
     file = st.file_uploader("", type=["csv"])
 
 
+    opt = st.radio(label = 'Who is viewing', options = ['Management','Data Science Team','Summary'])
+    
+
+
+
 
 if file is not None:
     df = pd.read_csv(file,encoding='windows-1254')
-    
-    # df = predict.predict(df)  
-    with st.spinner('Processing..'):
+    if opt == 'Management':
+        with st.spinner('Processing..'):
     # Do some time-consuming computation
         # time.sleep(0.75)
     
     # Once the computation is done, remove the spinner
         # st.success('Processing done!')
         
-        count_normal = df[df['Unusual']==0]['Unusual'].count()
-        count_abnormal = df[df['Unusual']==1]['Unusual'].count()
+            count_normal = df[df['Unusual']==0]['Unusual'].count()
+            count_abnormal = df[df['Unusual']==1]['Unusual'].count()
 
-        # new_data = pd.DataFrame({'No of Normal/Abnormal':[count_normal,count_abnormal]},index=['Count of Nomal Tower','Count of Abnormal Tower'])
+        # new_data = pd.DataFrame({'No of Normal/Abnormal's:[count_normal,count_abnormal]},index=['Count of Nomal Tower','Count of Abnormal Tower'])
         # st.dataframe(new_data)
 
         # create the columns 
@@ -119,3 +123,20 @@ if file is not None:
 
         # Render the chart in Streamlit
         st.altair_chart(chart, use_container_width=True)
+
+
+    if opt == 'Data Science Team':
+        st.header("Data Science Team")
+    
+    if opt == 'Summary':
+        st.header("Summary") 
+        def get_table(df):
+            datatable = df.drop('Unusual',axis=1)
+            return datatable
+        datatable = get_table(df)
+        st.markdown("### Summary of uploaded data")
+        st.markdown("The following table gives you a quick view of the uploaded data.")
+        st.table(datatable)# will display the table
+    
+    # df = predict.predict(df)  
+    
