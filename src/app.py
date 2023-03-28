@@ -13,14 +13,10 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import dill
 from sklearn import set_config
 
-# from model
-from xgboost import XGBClassifier
-
-import sys
-
-# import the pipeline file
-print(sys.path.insert(1,'../src'))
-import predict
+from predict import predict
+project_dir = Path(__file__).resolve().parents[1]
+with open(project_dir.joinpath('notebooks/pipelines/PreprocessingPipeline2.0.pkl'), 'rb') as f:
+    pipeline, categories = dill.load(f)
 
 st.set_page_config(
     page_title="Telewire Dashboard",
@@ -36,12 +32,16 @@ with st.sidebar:
     st.header("Upload Data file here for prediction")
 
     file = st.file_uploader("", type=["csv"])
-
+    
 
 
 if file is not None:
-    df = pd.read_csv(file,encoding='windows-1254')
-    
+    df = pd.read_csv(file,encoding= 'unicode_escape')
+    # df = pd.read_csv(project_dir.joinpath('data/raw/test.csv'),  encoding= 'unicode_escape')
+    df = df.drop(["Unusual"], axis=1)
+    prediction = predict(df)
+    print(prediction)
+    df['Unusual'] = prediction
     # df = predict.predict(df)  
     with st.spinner('Processing..'):
     # Do some time-consuming computation
