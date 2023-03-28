@@ -10,7 +10,7 @@ project_dir = Path(__file__).resolve().parents[1]
 # Define a function to make predictions
 def predict(df):
     # Load the preprocessing pipeline from a pickle file
-    with open(project_dir.joinpath('models/ModelXGboost.pkl'), 'rb') as f:
+    with open(project_dir.joinpath('models/RandomForestClassifier.pkl'), 'rb') as f:
         model = dill.load(f)
     # Preprocess the data using the preprocessing function
     preprocessed_df = preprocess(df)
