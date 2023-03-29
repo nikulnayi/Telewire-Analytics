@@ -28,15 +28,15 @@ with st.sidebar:
     st.header("Upload Data file here for prediction")
 
     file = st.file_uploader("", type=["csv"])
-    options = ["Normal", "Data Science", "Data Decsription"]
-    selected_option = st.radio("Select an option", options)
+    options = ["Management", "Data Science", "Data Decsription"]
+    selected_option = st.radio("Who is viewing?", options)
 col1,col2 = st.columns([0.75,6])
 
 # with col2:
 st.title("Cell Tower Anomaly Detection")
 
 if file is not None:
-    
+
     df = pd.read_csv(file,encoding= 'unicode_escape')
     df = df.drop(["Unusual"], axis=1)
     temp_df = df.copy()
@@ -44,7 +44,7 @@ if file is not None:
     df['Unusual'] = prediction  
         
 
-    if selected_option == 'Normal':
+    if selected_option == 'Management':
         with st.spinner('Processing...'):
             
             # Once the computation is done, remove the spinner
@@ -127,15 +127,34 @@ if file is not None:
 
             st.markdown("This is a web app that uses the Cell Tower Log data to predict if it perfroms abnormal or not. The source code of this app is available on [Github](https://github.com/Anupriya-Sri/TBC-AIP-2023-A7_Telewire-Analytics)")   
 
-        
-            # Stastics Summary
-            st.write("## Stastical Summary")
-            st.write(pd.DataFrame(df).describe())
+            col1,col2 = st.columns(2)
+            with col1:
+                # Stastics Summary
+                st.write("## Stastical Summary")
+                st.write(pd.DataFrame(df).describe())
+            with col2:
+                # missing values
+                st.write("## Columns with missing values")
+                if (df.isna().sum()>0).any():
+                    missing_value_count = df.isnull().sum()
+                    columns_missing_values = missing_value_count[missing_value_count > 0].index
+                    # Subset the original DataFrame with the selected columns
+                    df_subset = df[columns_missing_values].isnull().sum()
+                    st.dataframe(df_subset.transpose())
+                else:
+                    st.markdown("### There are no missing values in uploaded data")
 
-            # missing values
-            st.write("## Columns with missing values")
-            st.dataframe(pd.DataFrame(df.isnull().sum()).transpose(),width=1800)
+            # heat map to see the relationship of features
+
+            st.markdown("### Heatmap to show relationship between features")
+            fig, ax = plt.subplots(figsize=(18,15))
+            
+            cmap = sns.diverging_palette(220, 10, as_cmap=True)
+            sns.heatmap(df.corr(), ax=ax,annot=True,cmap=cmap)
+            st.pyplot(fig)
     if selected_option == 'Data Decsription':
         with st.spinner('Processing...'):
-
-            pass
+            datatable = df.drop('Unusual',axis=1)
+            st.markdown("### Summary of uploaded data")
+            st.markdown("The following table gives you a quick view of the uploaded data.")
+            st.dataframe(datatable)# will display the table
