@@ -149,7 +149,7 @@ tzdata==2023.2
 tzlocal==4.3
 uri-template==1.2.0
 urllib3==1.26.14
-utils @ file:///Users/nikulnayi/Documents/AIP/Telewire/TBC-AIP-2023-A7_Telewire-Analytics
+utils==1.0.0
 validators==0.20.0
 wcwidth==0.2.6
 webcolors==1.12
