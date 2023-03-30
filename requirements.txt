@@ -63,6 +63,7 @@ jupyterlab-widgets==3.0.5
 keras==2.11.0
 kiwisolver==1.4.4
 libclang==15.0.6.1
+lightgbm==3.3.5
 Markdown==3.4.1
 markdown-it-py==2.2.0
 MarkupSafe==2.1.2
@@ -120,6 +121,7 @@ rich==13.3.3
 rsa==4.9
 scikit-learn==1.0.2
 scipy==1.10.1
+seaborn==0.12.2
 semver==2.13.0
 Send2Trash==1.8.0
 six==1.16.0
@@ -132,7 +134,6 @@ streamlit==1.20.0
 tensorboard==2.11.2
 tensorboard-data-server==0.6.1
 tensorboard-plugin-wit==1.8.1
-tensorflow==2.11.0
 tensorflow-estimator==2.11.0
 tensorflow-io-gcs-filesystem==0.31.0
 termcolor==2.2.0
