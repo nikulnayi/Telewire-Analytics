@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import altair as alt
 import numpy as np
+import seaborn as sns
 from pathlib import Path
 
 # from preprocessing
@@ -65,9 +66,24 @@ if file is not None:
     
     # Once the computation is done, remove the spinner
         # st.success('Processing done!')
-        
+            Unusual = df[df['Unusual']==1]
+            Unusual = Unusual[['Time','CellName','Unusual']]
+            st.write('Below is the list of unusual acitivties predicted. \
+                      Kindly take a look and consider re-configuration of the Cell Towers')
+            st.dataframe(Unusual)
+            Unusual = (Unusual.drop('Unusual',axis=1)).sample(100)
             count_normal = df[df['Unusual']==0]['Unusual'].count()
             count_abnormal = df[df['Unusual']==1]['Unusual'].count()
+
+            c = alt.Chart(Unusual).mark_circle(size=40).encode(
+            x='CellName', y='Time').properties(
+            width=700,
+            height=500
+        )
+
+
+            st.altair_chart(c, use_container_width=True)
+
 
         # new_data = pd.DataFrame({'No of Normal/Abnormal's:[count_normal,count_abnormal]},index=['Count of Nomal Tower','Count of Abnormal Tower'])
         # st.dataframe(new_data)
@@ -100,38 +116,45 @@ if file is not None:
             # group by 'Cell Name' and count the number of occurrences of 0 and 1
             
             counts = (df.groupby(['CellName', 'Unusual'])['Unusual']).count()
-            # n = st.sidebar.slider('Number of features?', 1, counts,3)
             # convert counts to a DataFrame and unstack the 'Status' index level
             counts_df = counts.unstack(level='Unusual', fill_value=0)
-
             st.bar_chart(counts_df)
             # fig, ax = plt.subplots()
+           
             # ax.bar(df['Unusual'].head(20), df['Time'].head(20))
             # st.pyplot(fig)
-
+        #     prb_usage = px.bar(
+        #     df, 
+        #     x='PRBUsageUL',
+        #     y='Unusual',
+        #     labels={'y':'Unusual','x':'PRBUsageUL'},
+        #     title= 'Bar chart',width=500, height=400,
+        #     color='Unusual')
+        # st.plotly_chart(prb_usage)
 
         col1,col2 = st.columns(2)
+        
+        n = st.slider('Number of features', 1, 13,3)
+        def XGBoost(x, y):
+                x = df.drop(['Time','CellName','maxUE_UL+DL','Unusual'],axis=1)
+                model = XGBClassifier()
+                model.fit(x, y)
+                feat_importances = pd.Series(model.feature_importances_, index=x.columns).sort_values(ascending=True)
+                top_n_features = feat_importances[:n]
+                figure = px.bar(top_n_features,
+                 x=top_n_features.values,
+                y=top_n_features.keys(), labels = {'x':'Importance Value', 'index':'Columns'},
+                text=np.round(top_n_features.values, 2),
+                title= ' Feature Importance Plot',
+                    width=1000, height=400)
+                figure.update_layout({
+                    'plot_bgcolor': 'rgba(0, 0, 0, 0)',
+                    'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+            })
+                st.plotly_chart(figure)
+        XGBoost(x,y)
 
-
-
-        # n = st.sidebar.slider('Number of features?', 1, 13,3)
-        # def XGBoost(x, y):
-        #     model = XGBClassifier()
-        #     model.fit(x, y)
-        #     feat_importances = pd.Series(model.feature_importances_, index=x.columns).sort_values(ascending=False)
-        #     top_n_features = feat_importances[:n]
-        #     figure = px.bar(top_n_features,
-        #     x=top_n_features.values,
-        #     y=top_n_features.keys(), labels = {'x':'Importance Value', 'index':'Columns'},
-        #     text=np.round(top_n_features.values, 2),
-        #     title= ' Feature Selection Plot',
-        #             width=1000, height=600)
-        #     figure.update_layout({
-        #             'plot_bgcolor': 'rgba(0, 0, 0, 0)',
-        #             'paper_bgcolor': 'rgba(0, 0, 0, 0)',
-        #     })
-        #     st.plotly_chart(figure)
-        # XGBoost(x,y)
+  
         #st.pyplot(plot_importance(df).figure)
         # with col1:
         #     st.text("Distribution of Time During Unusual")
@@ -165,7 +188,32 @@ if file is not None:
 
     if opt == 'Data Science Team':
         st.markdown("The source code of this app is available on [Github](https://github.com/Anupriya-Sri/TBC-AIP-2023-A7_Telewire-Analytics)")
-    
+        
+        col1,col2 = st.columns(2)
+        with col1:
+                # Stastics Summary
+                st.write("## Stastical Summary")
+                st.write(pd.DataFrame(df).describe())
+        with col2:
+                # missing values
+                st.write("## Columns with missing values")
+                if (df.isna().sum()>0).any():
+                    missing_value_count = df.isnull().sum()
+                    columns_missing_values = missing_value_count[missing_value_count > 0].index
+                    # Subset the original DataFrame with the selected columns
+                    df_subset = df[columns_missing_values].isnull().sum()
+                    st.dataframe(df_subset.transpose())
+                else:
+                    st.markdown("### There are no missing values in uploaded data")
+
+            # heat map to see the relationship of features
+
+        st.markdown("### Heatmap to show relationship between features")
+        fig, ax = plt.subplots(figsize=(18,15))
+            
+        cmap = sns.diverging_palette(220, 10, as_cmap=True)
+        sns.heatmap(df.corr(), ax=ax,annot=True,cmap=cmap)
+        st.pyplot(fig)
 
     if opt == 'Summary':
         def get_table(df):
@@ -174,7 +222,7 @@ if file is not None:
         datatable = get_table(df)
         st.markdown("### Summary of uploaded data")
         st.markdown("The following table gives you a quick view of the uploaded data.")
-        st.table(datatable)# will display the table
+        st.dataframe(datatable)# will display the table
     
     # df = predict.predict(df)  
     
