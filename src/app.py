@@ -17,11 +17,12 @@ from xgboost import XGBClassifier
 from sklearn import set_config
 from predict import predict
 
-
 project_dir = Path(__file__).resolve().parents[1]
+with open(project_dir.joinpath('notebooks/pipelines/PreprocessingPipeline2.0.pkl'), 'rb') as f:
+    pipeline, categories = dill.load(f)
 with open(project_dir.joinpath('models/RandomForestClassifier.pkl'), 'rb') as f:
         model = dill.load(f)
-
+# top_n_features = []
 st.set_page_config(
     page_title="Telewire Dashboard",
     page_icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeqOxnyNX_UCarYAKSkIsY7CWQZlBzULPyMg&usqp=CAU",
@@ -83,19 +84,19 @@ if file is not None:
 
                     st.pyplot(fig1)
                 with col2:
-                    # Bar graph
+                                     # scatter plot CellName vs Time
+                    Unusual = df[df['Unusual']==1]
+                    Unusual = Unusual[['Time','CellName','Unusual']]
+                    st.write('Below is the list of unusual acitivties predicted. \
+                        Kindly take a look and consider re-configuration of the Cell Towers')
                     
-                    st.markdown("Count of Cell Tower with respect to its behavior")
-                    # group by 'Cell Name' and count the number of occurrences of 0 and 1
-
-                    df['Unusual']=df['Unusual'].replace({0:"Usual",1:"Unusual"})
-                    counts = df.groupby(['CellName', 'Unusual'])['Unusual'].count()
-                    
-                    # convert counts to a DataFrame and unstack the 'Status' index level
-                    counts_df = counts.unstack(level='Unusual', fill_value=0)
-                    
-                    st.bar_chart(counts_df)
-
+                    Unusual = (Unusual.drop('Unusual',axis=1)).sample(100)
+                    c = alt.Chart(Unusual).mark_circle(size=40).encode(
+                            x='CellName', y='Time').properties(
+                            width=700,
+                            height=500
+                            )
+                    st.altair_chart(c, use_container_width=True)
 
                 col1,col2 = st.columns(2)
                 # with col1:
@@ -112,45 +113,42 @@ if file is not None:
                 #     plt.ylabel('Frequency')
                 #     st.pyplot(fig)
                 
+
                 
                 
-                # Create an Altair chart
-                chart = alt.Chart(df[df['Unusual']==1]).mark_circle(size=25).encode(
-                    x='CellName',
-                    y='Time',
-                    color='Unusual'
-                ).properties(
-                    width=700,
-                    height=500
-                )
+                # Bar graph
+                    
+                st.markdown("Count of Cell Tower with respect to its behavior")
+                    # group by 'Cell Name' and count the number of occurrences of 0 and 1
 
-                # Render the chart in Streamlit
-                st.altair_chart(chart, use_container_width=True)
+                temp_df['Unusual']=df['Unusual'].replace({0:"Usual",1:"Unusual"})
+                counts = temp_df.groupby(['CellName', 'Unusual'])['Unusual'].count()
+                    
+                    # convert counts to a DataFrame and unstack the 'Status' index level
+                counts_df = counts.unstack(level='Unusual', fill_value=0)
+                    
+                st.bar_chart(counts_df)
 
+                # feature importance graph
                 n = st.slider('Number of features', 1, 13,3)
-                def XGBoost(x, y):
-                    x = df.drop(['Time','CellName','maxUE_UL+DL','Unusual'],axis=1)
-                    y = df['Unusual']
-                    model.fit(x,y)
-                    # model = XGBClassifier()
-                    # model.fit(x, y)
-                    feat_importances = pd.Series(model.named_steps['RandomForestClassifier'].feature_importances_, index=x.columns).sort_values(ascending=True)
-                    top_n_features = feat_importances[:n]
-                    figure = px.bar(top_n_features,
-                    x=top_n_features.values,
-                    y=top_n_features.keys(), labels = {'x':'Importance Value', 'index':'Columns'},
-                    text=np.round(top_n_features.values, 2),
-                    title= ' Feature Importance Plot',
+                
+                x = df.drop(['Time','CellName','maxUE_UL+DL','Unusual'],axis=1)
+                y = df['Unusual']
+                model.fit(x,y)
+                feat_importances = pd.Series(model.named_steps['RandomForestClassifier'].feature_importances_, index=x.columns).sort_values(ascending=True)
+                top_n_features = feat_importances[:n]
+                figure = px.bar(top_n_features,
+                x=top_n_features.values,
+                y=top_n_features.keys(), labels = {'x':'Importance Value', 'index':'Columns'},
+                text=np.round(top_n_features.values, 2),
+                title= ' Feature Importance Plot',
                         width=1000, height=400)
-                    figure.update_layout({
+                figure.update_layout({
                         'plot_bgcolor': 'rgba(0, 0, 0, 0)',
                         'paper_bgcolor': 'rgba(0, 0, 0, 0)',
                 })
-                    st.plotly_chart(figure)
-                x = df.iloc[:, :-1]  # Using all column except for the last column as X
-                y = df.iloc[:, -1]  # Selecting the last column as Y
+                st.plotly_chart(figure)
 
-                XGBoost(x,y)
 
     if selected_option == 'Data Science':
         with st.spinner('Processing...'):
@@ -185,16 +183,22 @@ if file is not None:
             
             cmap = sns.diverging_palette(220, 10, as_cmap=True)
             sns.heatmap(df.corr(), ax=ax,annot=True,cmap=cmap)
+
+            st.pyplot(fig)
+            
+            
+            st.markdown("### Box plot to see the outliers")
+            # boxplot
+            fig, ax = plt.subplots(figsize=(12,8))
+            sns.boxplot(data=df.drop('Unusual',axis=1))
+            plt.ylim(0, 80)
+            # Set the axis labels and title
+            ax.set_xlabel('Features')
+            ax.set_ylabel('Distribution')
+            ax.set_title('Box Plot')
+            # Display the box plot in Streamlit
             st.pyplot(fig)
 
-            # boxplot
-            boxplot = alt.Chart(df).mark_boxplot().encode(
-                                y='value',
-                                x='variable'
-                                    )
-
-            # Display the chart using Streamlit
-            st.altair_chart(boxplot, use_container_width=True)
     if selected_option == 'Data Decsription':
         with st.spinner('Processing...'):
             datatable = df.drop('Unusual',axis=1)
