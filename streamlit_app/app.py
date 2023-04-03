@@ -132,7 +132,7 @@ if file is not None:
         #     color='Unusual')
         # st.plotly_chart(prb_usage)
 
-        col1,col2 = st.columns(2)
+      
         
         n = st.slider('Number of features', 1, 13,3)
         def XGBoost(x, y):
@@ -188,7 +188,7 @@ if file is not None:
 
     if opt == 'Data Science Team':
         st.markdown("The source code of this app is available on [Github](https://github.com/Anupriya-Sri/TBC-AIP-2023-A7_Telewire-Analytics)")
-        
+        col1,col2 = st.columns(2)
         col1,col2 = st.columns(2)
         with col1:
                 # Stastics Summary

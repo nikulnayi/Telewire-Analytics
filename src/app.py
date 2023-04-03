@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import altair as alt
 import numpy as np
 from pathlib import Path
+import plotly.express as px
 import seaborn as sns
 
 # from preprocessing
@@ -12,12 +13,14 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.base import BaseEstimator, TransformerMixin
 import dill
+from xgboost import XGBClassifier
 from sklearn import set_config
-
 from predict import predict
+
+
 project_dir = Path(__file__).resolve().parents[1]
-with open(project_dir.joinpath('notebooks/pipelines/PreprocessingPipeline2.0.pkl'), 'rb') as f:
-    pipeline, categories = dill.load(f)
+with open(project_dir.joinpath('models/RandomForestClassifier.pkl'), 'rb') as f:
+        model = dill.load(f)
 
 st.set_page_config(
     page_title="Telewire Dashboard",
@@ -69,7 +72,7 @@ if file is not None:
                 col1,col2=st.columns(2)
                 with col1:
                     # create a pie chart with the data
-                    st.text("Percentage share of Usual and Unusual")
+                    st.markdown("Percentage share of Usual and Unusual")
                     sizes = [count_normal,count_abnormal]
                     explode = (0, 0.1)
                     fig1, ax1 = plt.subplots()
@@ -82,10 +85,12 @@ if file is not None:
                 with col2:
                     # Bar graph
                     
-                    st.text("Count of Cell Tower with respect to its behavior")
+                    st.markdown("Count of Cell Tower with respect to its behavior")
                     # group by 'Cell Name' and count the number of occurrences of 0 and 1
-                    counts = df.groupby(['CellName', 'Unusual'])['Unusual'].count()
 
+                    df['Unusual']=df['Unusual'].replace({0:"Usual",1:"Unusual"})
+                    counts = df.groupby(['CellName', 'Unusual'])['Unusual'].count()
+                    
                     # convert counts to a DataFrame and unstack the 'Status' index level
                     counts_df = counts.unstack(level='Unusual', fill_value=0)
                     
@@ -110,7 +115,7 @@ if file is not None:
                 
                 
                 # Create an Altair chart
-                chart = alt.Chart(df).mark_circle(size=25).encode(
+                chart = alt.Chart(df[df['Unusual']==1]).mark_circle(size=25).encode(
                     x='CellName',
                     y='Time',
                     color='Unusual'
@@ -121,6 +126,31 @@ if file is not None:
 
                 # Render the chart in Streamlit
                 st.altair_chart(chart, use_container_width=True)
+
+                n = st.slider('Number of features', 1, 13,3)
+                def XGBoost(x, y):
+                    x = df.drop(['Time','CellName','maxUE_UL+DL','Unusual'],axis=1)
+                    y = df['Unusual']
+                    model.fit(x,y)
+                    # model = XGBClassifier()
+                    # model.fit(x, y)
+                    feat_importances = pd.Series(model.named_steps['RandomForestClassifier'].feature_importances_, index=x.columns).sort_values(ascending=True)
+                    top_n_features = feat_importances[:n]
+                    figure = px.bar(top_n_features,
+                    x=top_n_features.values,
+                    y=top_n_features.keys(), labels = {'x':'Importance Value', 'index':'Columns'},
+                    text=np.round(top_n_features.values, 2),
+                    title= ' Feature Importance Plot',
+                        width=1000, height=400)
+                    figure.update_layout({
+                        'plot_bgcolor': 'rgba(0, 0, 0, 0)',
+                        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+                })
+                    st.plotly_chart(figure)
+                x = df.iloc[:, :-1]  # Using all column except for the last column as X
+                y = df.iloc[:, -1]  # Selecting the last column as Y
+
+                XGBoost(x,y)
 
     if selected_option == 'Data Science':
         with st.spinner('Processing...'):
@@ -147,11 +177,24 @@ if file is not None:
             # heat map to see the relationship of features
 
             st.markdown("### Heatmap to show relationship between features")
+        
+            st.markdown("If the value is postive, that means when one variable increases, the other variable also increases.")
+            st.markdown("If the value is negative, that means when one variable increases, the other variable also decreases.")
+            st.markdown("If the value is 0,  there is no correlation between the two variables. This means that the variables changes in a random manner with respect to each other")
             fig, ax = plt.subplots(figsize=(18,15))
             
             cmap = sns.diverging_palette(220, 10, as_cmap=True)
             sns.heatmap(df.corr(), ax=ax,annot=True,cmap=cmap)
             st.pyplot(fig)
+
+            # boxplot
+            boxplot = alt.Chart(df).mark_boxplot().encode(
+                                y='value',
+                                x='variable'
+                                    )
+
+            # Display the chart using Streamlit
+            st.altair_chart(boxplot, use_container_width=True)
     if selected_option == 'Data Decsription':
         with st.spinner('Processing...'):
             datatable = df.drop('Unusual',axis=1)
