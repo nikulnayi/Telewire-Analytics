@@ -89,6 +89,7 @@ pexpect==4.8.0
 pickleshare==0.7.5
 Pillow==9.4.0
 platformdirs==3.0.0
+plotly==5.14.0
 prometheus-client==0.16.0
 prompt-toolkit==3.0.38
 protobuf==3.19.6
@@ -131,6 +132,7 @@ soupsieve==2.4
 src==0.1.0
 stack-data==0.6.2
 streamlit==1.20.0
+tenacity==8.2.2
 tensorboard==2.11.2
 tensorboard-data-server==0.6.1
 tensorboard-plugin-wit==1.8.1
