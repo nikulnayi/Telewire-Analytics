@@ -1,4 +1,4 @@
-name: Telewire Analytics
+name: TelewireAnalytics
 channels:
   - conda-forge
   - defaults
