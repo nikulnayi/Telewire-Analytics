@@ -37,7 +37,7 @@ with st.sidebar:
 col1,col2 = st.columns([0.75,6])
 
 # with col2:
-st.title("Cell Tower Anomaly Detection")
+st.title("Telewire Analytics")
 
 if file is not None:
 
@@ -84,7 +84,7 @@ if file is not None:
 
                     st.pyplot(fig1)
                 with col2:
-                                     # scatter plot CellName vs Time
+                    # scatter plot CellName vs Time
                     Unusual = df[df['Unusual']==1]
                     Unusual = Unusual[['Time','CellName','Unusual']]
                     st.write('Below is the list of unusual acitivties predicted. \
@@ -98,24 +98,9 @@ if file is not None:
                             )
                     st.altair_chart(c, use_container_width=True)
 
-                col1,col2 = st.columns(2)
-                # with col1:
-                #     st.text("Distribution of Time During Unusual")
-                #     fig, ax = plt.subplots()
-                #     # ax.tick_params(axis='x', rotation=90)
-                #     hour_data = pd.to_datetime(df[df['Unusual']==1]['Time'],format='%H:%M').dt.hour
-                    
-                #     ax.hist(hour_data, bins=10,range=(0,24))
-                #     # set the x-axis label
-                #     plt.xlabel('Hour')
 
-                #     # set the y-axis label
-                #     plt.ylabel('Frequency')
-                #     st.pyplot(fig)
-                
 
-                
-                
+
                 # Bar graph
                     
                 st.markdown("Count of Cell Tower with respect to its behavior")
@@ -137,6 +122,18 @@ if file is not None:
                 
                 x = df.drop(['Time','CellName','maxUE_UL+DL','Unusual'],axis=1)
                 y = df['Unusual']
+                dict_parameter = {
+                     "meanUE_UL":"Average number of user equipment (UE) devices that were simultaneously active during the last 15 minutes. UL means communication from User to CellTower.",
+                     "meanUE_DL":"Average number of user equipment (UE) devices that were simultaneously active during the last 15 minutes. DL means communication from CellTower to User.",
+                     "PRBUsageDL":"Level of resource utilization in that cell measured as the portion of Physical Radio Blocks (PRB) that were in use (%) in the previous 15 minutes",
+                     "PRBUsageUL":"Level of resource utilization in that cell measured as the portion of Physical Radio Blocks (PRB) that were in use (%) in the previous 15 minutes",
+                     "maxThr_UL":"Maximum carried traffic (in Mbps) measured in the last 15 minutes.",
+                     "maxThr_DL":"Maximum carried traffic (in Mbps) measured in the last 15 minutes.",
+                     "meanThr_UL":"Average carried traffic (in Mbps) during the past 15 minutes.",
+                     "meanThr_DL":"Average carried traffic (in Mbps) during the past 15 minutes",
+                     "maxUE_DL":"Maximum number of user equipment (UE) devices that were simultaneously active during the last 15 minutes.",
+                     "maxUE_UL":"Maximum number of user equipment (UE) devices that were simultaneously active during the last 15 minutes."
+                }
                 model.fit(x,y)
                 if "myslider" not in st.session_state:
                      st.session_state.myslider = 3
@@ -155,19 +152,10 @@ if file is not None:
                         'paper_bgcolor': 'rgba(0, 0, 0, 0)',
                 })
                 st.plotly_chart(figure)
+                for i in top_n_features.keys():
+                     st.write(f"**{i}:**")
+                     st.write(f"{dict_parameter[i]}")
 
-
-
-
-                # fig, ax = plt.subplots()
-                # feat_importances.plot.barh(ax=ax)
-                # ax.set_title(f"Top {n} parameters")
-                # ax.set_xlabel("Ratio of Importance")
-                # ax.set_ylabel("Parameters")
-                # st.pyplot(fig)
-                
-                # Plot initial feature importances
-                # plot_feature_importances(st.session_state.myslider)
 
 
     if selected_option == 'Data Science':
