@@ -48,7 +48,7 @@ if file is not None:
     df['Unusual'] = prediction  
         
 
-    if selected_option == 'Management':
+    if selected_option == 'Company':
         with st.spinner('Processing...'):
             
             # Once the computation is done, remove the spinner
@@ -172,9 +172,9 @@ if file is not None:
                 else:
                     st.markdown("### There are no missing values in uploaded data")
 
-            # heat map to see the relationship of features
+            # heat map to see the relationship of Parameters
 
-            st.markdown("### Heatmap to show relationship between features")
+            st.markdown("### Heatmap to show relationship between Parameters")
         
             st.markdown("If the value is postive, that means when one variable increases, the other variable also increases.")
             st.markdown("If the value is negative, that means when one variable increases, the other variable also decreases.")
@@ -193,7 +193,7 @@ if file is not None:
             sns.boxplot(data=df.drop('Unusual',axis=1))
             plt.ylim(0, 80)
             # Set the axis labels and title
-            ax.set_xlabel('Features')
+            ax.set_xlabel('Parameters')
             ax.set_ylabel('Distribution')
             ax.set_title('Box Plot')
             # Display the box plot in Streamlit
