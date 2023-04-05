@@ -32,7 +32,7 @@ with st.sidebar:
     st.header("Upload Data file here for prediction")
 
     file = st.file_uploader("", type=["csv"])
-    options = ["Management", "Data Science", "Data Decsription"]
+    options = ["Company", "Data Science", "Data Decsription"]
     selected_option = st.radio("Who is viewing?", options)
 col1,col2 = st.columns([0.75,6])
 
@@ -94,7 +94,7 @@ if file is not None:
                     c = alt.Chart(Unusual).mark_circle(size=40).encode(
                             x='CellName', y='Time').properties(
                             width=700,
-                            height=500
+                            height=300
                             )
                     st.altair_chart(c, use_container_width=True)
 
@@ -130,24 +130,44 @@ if file is not None:
                 st.bar_chart(counts_df)
 
                 # feature importance graph
-                n = st.slider('Number of features', 1, 13,3)
+                # def slider_callback():
+                     
+                    
+                # n = st.slider('Parameters', 1, 13,3,key="myslider")
                 
                 x = df.drop(['Time','CellName','maxUE_UL+DL','Unusual'],axis=1)
                 y = df['Unusual']
                 model.fit(x,y)
-                feat_importances = pd.Series(model.named_steps['RandomForestClassifier'].feature_importances_, index=x.columns).sort_values(ascending=True)
-                top_n_features = feat_importances[:n]
+                if "myslider" not in st.session_state:
+                     st.session_state.myslider = 3
+                # Create a slider widget and specify the callback function
+                n = st.slider("Select number of top parameters to display", min_value=1,value=st.session_state.myslider, max_value=len(x.columns),step=1,)
+                feat_importances = pd.Series(model.named_steps['RandomForestClassifier'].feature_importances_, index=x.columns)
+                top_n_features = feat_importances.nlargest(n)
                 figure = px.bar(top_n_features,
                 x=top_n_features.values,
-                y=top_n_features.keys(), labels = {'x':'Importance Value', 'index':'Columns'},
+                y=top_n_features.keys(), labels = {'x':'Ratio of Importance Value', 'index':'Parameter(s)'},
                 text=np.round(top_n_features.values, 2),
-                title= ' Feature Importance Plot',
-                        width=1000, height=400)
+                title= f'Top {len(top_n_features)} Parameter(s)',
+                    )
                 figure.update_layout({
                         'plot_bgcolor': 'rgba(0, 0, 0, 0)',
                         'paper_bgcolor': 'rgba(0, 0, 0, 0)',
                 })
                 st.plotly_chart(figure)
+
+
+
+
+                # fig, ax = plt.subplots()
+                # feat_importances.plot.barh(ax=ax)
+                # ax.set_title(f"Top {n} parameters")
+                # ax.set_xlabel("Ratio of Importance")
+                # ax.set_ylabel("Parameters")
+                # st.pyplot(fig)
+                
+                # Plot initial feature importances
+                # plot_feature_importances(st.session_state.myslider)
 
 
     if selected_option == 'Data Science':
