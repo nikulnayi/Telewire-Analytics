@@ -30,8 +30,8 @@ streamlit run src/app.py
 
 #### Team
 * [Anupriya Srivastava](https://github.com/Anupriya-Sri)
-* [Hani Desai](https://github.com/Anupriya-Sri)
-* [Harsh Patel](https://github.com/Anupriya-Sri)
-* [Mashkoor husain Husaini](https://github.com/Anupriya-Sri)
-* [Nikul Nayi](https://github.com/Anupriya-Sri)
-* [Reshma Muralidharan](https://github.com/Anupriya-Sri)
+* [Hani Desai](https://github.com/HaniDesai)
+* [Harsh Patel](https://github.com/harshpatel111198)
+* [Mashkoor husain Husaini](https://github.com/)
+* [Nikul Nayi](https://github.com/nikulnayi)
+* [Reshma Muralidharan](https://github.com/reshmamuralidharanpillai)
