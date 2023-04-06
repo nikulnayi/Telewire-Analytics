@@ -27,3 +27,6 @@ conda activate TelewireAnalytics
 ```sh
 streamlit run src/app.py
 ```
+
+###### Team
+* [Anupriya Srivastava](https://github.com/Anupriya-Sri)
