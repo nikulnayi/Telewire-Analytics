@@ -22,3 +22,8 @@ conda env create --file environment.yml
 ```sh
 conda activate TelewireAnalytics
 ```
+
+#### Step 4: Run the Dashboard ####
+```sh
+streamlit run src/app.py
+```
