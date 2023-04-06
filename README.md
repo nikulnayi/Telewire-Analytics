@@ -9,3 +9,6 @@
 - python3
 ####
 #### Step 1: Clone Repository ####
+```sh
+git clone https://github.com/Anupriya-Sri/TBC-AIP-2023-A7_Telewire-Analytics.git
+```
