@@ -12,3 +12,13 @@
 ```sh
 git clone https://github.com/Anupriya-Sri/TBC-AIP-2023-A7_Telewire-Analytics.git
 ```
+
+#### Step 2: Create conda environment ####
+```sh
+conda env create --file environment.yml
+```
+
+#### Step 3: Activate environment ####
+```sh
+conda activate TelewireAnalytics
+```
