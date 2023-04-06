@@ -28,5 +28,10 @@ conda activate TelewireAnalytics
 streamlit run src/app.py
 ```
 
-###### Team
+#### Team
 * [Anupriya Srivastava](https://github.com/Anupriya-Sri)
+* [Hani Desai](https://github.com/Anupriya-Sri)
+* [Harsh Patel](https://github.com/Anupriya-Sri)
+* [Mashkoor husain Husaini](https://github.com/Anupriya-Sri)
+* [Nikul Nayi](https://github.com/Anupriya-Sri)
+* [Reshma Muralidharan](https://github.com/Anupriya-Sri)
