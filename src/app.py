@@ -184,18 +184,20 @@ if file is not None:
 
             st.markdown("### Heatmap to show relationship between Parameters")
         
-            st.markdown("If the value is postive, that means when one variable increases, the other variable also increases.")
-            st.markdown("If the value is negative, that means when one variable increases, the other variable also decreases.")
-            st.markdown("If the value is 0,  there is no correlation between the two variables. This means that the variables changes in a random manner with respect to each other")
+            st.markdown("* If the value is postive, that means when one variable increases, the other variable also increases.")
+            st.markdown("* If the value is negative, that means when one variable increases, the other variable also decreases.")
+            st.markdown("* If the value is 0,  there is no correlation between the two variables. This means that the variables changes in a random manner with respect to each other")
             fig, ax = plt.subplots(figsize=(18,15))
             
-            cmap = sns.diverging_palette(220, 10, as_cmap=True)
-            sns.heatmap(df.corr(), ax=ax,annot=True,cmap=cmap)
+            corr = df.corr()
+            sns.heatmap(corr, ax=ax,annot=True,cmap="coolwarm",mask=np.triu(np.ones_like(corr)))
 
             st.pyplot(fig)
             
             
-            st.markdown("### Box plot to see the outliers")
+            st.markdown("### Box plot")
+            st.markdown("* Identify outliers or anomalous data points")
+            st.markdown("* To understand the spread/range of the data")
             # boxplot
             fig, ax = plt.subplots(figsize=(12,8))
             sns.boxplot(data=df.drop('Unusual',axis=1))
