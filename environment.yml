@@ -15,6 +15,8 @@ dependencies:
   - xgboost==1.7.4
   - altair==4.2.2
   - dill==0.3.6
+  - kiwisolver
+  - libstdcxx-ng=9.3.0
   - pip:
     - streamlit
     - scikit-learn==1.0.2
