@@ -17,6 +17,7 @@ dependencies:
   - dill==0.3.6
   - kiwisolver
   - libstdcxx-ng=9.3.0
+  - pip
   - pip:
     - streamlit
     - scikit-learn==1.0.2
